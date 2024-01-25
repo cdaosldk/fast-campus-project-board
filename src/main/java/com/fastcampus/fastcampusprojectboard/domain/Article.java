@@ -22,9 +22,9 @@ import java.util.Set;
         @Index(columnList = "createdAt"),
         @Index(columnList = "createdBy")
 })
-@EntityListeners(AuditingEntityListener.class) // 메타데이터 기록을 위해 필요하다
+//@EntityListeners(AuditingEntityListener.class) // 메타데이터 기록을 위해 필요하다
 @Entity
-public class Article {
+public class Article extends AuditingFields {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -43,10 +43,13 @@ public class Article {
     @ToString.Exclude
     private Set<ArticleComment> articleComment = new LinkedHashSet<>();
 
-    @CreatedDate @Column(nullable = false) private LocalDateTime createdAt;
-    @CreatedBy @Column(nullable = false, length = 100) private String createdBy;
-    @LastModifiedDate @Column(nullable = false) private LocalDateTime modifiedAt;
-    @LastModifiedBy @Column(nullable = false, length = 100) private String modifiedBy;
+    // 메타데이터 공통부분 추출 ~ 클래스를 만들고 필드를 공통 메타데이터로 한다
+    // 1) 임베디드
+    // 2) mapped-superclass
+//    @CreatedDate @Column(nullable = false) private LocalDateTime createdAt;
+//    @CreatedBy @Column(nullable = false, length = 100) private String createdBy;
+//    @LastModifiedDate @Column(nullable = false) private LocalDateTime modifiedAt;
+//    @LastModifiedBy @Column(nullable = false, length = 100) private String modifiedBy;
 
     protected Article() {
     }

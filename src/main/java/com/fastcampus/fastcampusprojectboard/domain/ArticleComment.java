@@ -21,7 +21,7 @@ import java.time.LocalDateTime;
 })
 @EntityListeners(AuditingEntityListener.class) // 메타데이터 기록을 위해 필요하다
 @Entity
-public class ArticleComment {
+public class ArticleComment extends AuditingFields{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

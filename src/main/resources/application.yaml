@@ -12,6 +12,10 @@ logging:
 
 spring:
   datasource:
+# h2 데이터베이스 설정
+#    url: jdbc:h2:mem:testdb
+#    username: sa
+#    driver-class-name: org.h2.Driver
     url: jdbc:mysql://localhost:3306/board
     username : admin
     password : 1q2w3e4r
@@ -30,10 +34,10 @@ spring:
         format_sql: true
         # 복잡 쿼리를 사용할 때 최대 select 사이즈 설정 (n+1 문제 해결방안)
         default_batch_fetch_size: 100
-  h2:
-    # h2 웹 콘솔 활성화
-    console:
-      enabled: true
+#  h2:
+#    h2 웹 콘솔 활성화
+#    console:
+#      enabled: true
   sql:
     init:
       # date.sql 실행 시기 설정 ~ embedded : 테스트 환경에서만, always : 항상, never : 비활성화

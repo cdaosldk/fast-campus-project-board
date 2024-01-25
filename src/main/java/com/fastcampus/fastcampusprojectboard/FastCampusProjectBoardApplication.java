@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 public class FastCampusProjectBoardApplication {
 
 	public static void main(String[] args) {
+//		SpringApplication.run(FastCampusProjectBoardApplication.class, args).close();
 		SpringApplication.run(FastCampusProjectBoardApplication.class, args);
 	}
 

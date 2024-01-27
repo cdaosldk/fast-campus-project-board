@@ -41,7 +41,7 @@ public class Article extends AuditingFields {
     @Setter
     // toString이 모든 컬럼에 적용하기 위해 다 조회할 때, articleComment -> article -> articleComment .... ~ 제외해야한다
     @ToString.Exclude
-    private Set<ArticleComment> articleComment = new LinkedHashSet<>();
+    private Set<ArticleComment> articleComments = new LinkedHashSet<>();
 
     // 메타데이터 공통부분 추출 ~ 클래스를 만들고 필드를 공통 메타데이터로 한다
     // 1) 임베디드

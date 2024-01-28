@@ -10,7 +10,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest
+@DisplayName("View 컨트롤러 - 게시글")
+@WebMvcTest(ArticleControllerTest.class)
 class ArticleControllerTest {
 
     private final MockMvc mockMvc;

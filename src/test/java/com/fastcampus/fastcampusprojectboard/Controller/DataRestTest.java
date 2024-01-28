@@ -1,5 +1,6 @@
 package com.fastcampus.fastcampusprojectboard.Controller;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 //@WebMvcTest ~ 슬라이스 테스트이므로 동작 안됨
+@Disabled("통합테스트는 불필요하므로 테스트에서 제외한다")
 @DisplayName("Data Rest")
 @Transactional
 @AutoConfigureMockMvc

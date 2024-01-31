@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns="http://www.w3.org/1999/html">
+<head>
+    <meta charset="UTF-8">
+    <title>게시판 페이지</title>
+</head>
+<body>
+
+    <header id="header1"></header>
+    <main>
+        <header>
+            <h1>첫 번쨰 글</h1>
+        </header>
+        <aside>
+            <p><span class="nick-name">Uno</span></p>
+            <p><a id="email" href="mailto:djkehh@gmail.com">uno@mail.com</a></p>
+            <p><time id="created-at" datetime="2022-01-01T00:00:00">2022-01-01</time></p>
+            <p><span id="hashtag" class="badge text-bg-secondary mx-1"><a class="text-reset">#java</a></span></p>
+        </aside>
+
+        <section>
+            <pre>본문</pre>
+
+            <form>
+                <label for="articleComment">댓글</label>
+                <textarea id="articleComment" placeholder="댓글 쓰기..." rows="3"></textarea>
+                <button type="submit">쓰기</button>
+            </form>
+            <div>
+                <ul>
+                    <li>
+                        <div>
+                            <time><small>2022-01-01</small></time>
+                            <strong>Uno</strong>
+                            <p>
+                                Lorem ipsum dolor sit amet, consectetur adipiscing elit.<br>
+                                Lorem ipsum dolor sit amet
+                            </p>
+                        </div>
+                    </li>
+                    <li>
+                        <div>
+                            <time><small>2022-01-01</small></time>
+                            <strong>Uno</strong>
+                            <p>
+                                Lorem ipsum dolor sit amet, consectetur adipiscing elit.<br>
+                                Lorem ipsum dolor sit amet
+                            </p>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+            <nav>
+                <a href="#">prev</a>
+                <a href="#">next</a>
+            </nav>
+        </section>
+    </main>
+
+    <footer id="footer1"></footer>
+</body>
+</html>

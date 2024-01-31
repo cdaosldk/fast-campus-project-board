@@ -18,7 +18,7 @@ import java.time.LocalDateTime;
 @ToString
 @EntityListeners(AuditingEntityListener.class) // 메타데이터 기록을 위해 필요하다
 @MappedSuperclass
-public class AuditingFields {
+public abstract class AuditingFields { // 무조건 다른 클래스의 부모 클래스가 되기 떄문에
 
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     @CreatedDate

@@ -33,7 +33,10 @@ dependencies {
 			,	'org.springframework.data:spring-data-rest-hal-explorer'
 			,	'org.springframework.boot:spring-boot-starter-thymeleaf'
 			// 사용자가 만든 프로퍼티에 대한 문서화가 가능해진다
-			,	'org.springframework.boot:spring-boot-configuration-processor')
+			,	'org.springframework.boot:spring-boot-configuration-processor'
+			,	'org.springframework.boot:spring-boot-starter-security'
+			, 	'org.springframework.boot:spring-boot-starter-thymeleaf'
+			,  'org.thymeleaf.extras:thymeleaf-extras-springsecurity5' )// 타임리프 + 시큐리티는 필수
 //	runtimeOnly('com.h2database:h2:',	'com.mysql:mysql-connector-j')
 	runtimeOnly('com.h2database:h2:',	'mysql:mysql-connector-java')
 	compileOnly 'org.projectlombok:lombok'

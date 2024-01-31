@@ -1,14 +1,13 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" xmlns="http://www.w3.org/1999/html">
 <head>
     <meta charset="UTF-8">
     <title>게시판 페이지</title>
 </head>
 <body>
 
-    <header th:replace="header :: header"> <!-- th: replace와 insert ~ header 엘리멘트를 찾아가라-->
-    </header>
-
+<!--&lt;!&ndash;    <header th:replace="header :: header"> &lt;!&ndash; th: replace와 insert ~ header 엘리멘트를 찾아가라&ndash;&gt;&ndash;&gt;</header>-->
+    <header id="header1"></header>
     <main>
         <form>
             <label for="search-type" hidden>유형</label>
@@ -69,7 +68,7 @@
         </nav>
     </main>
 
-    <footer th:replace="footer :: footer"></footer>
-
+<!--    <footer th:replace="footer :: footer"></footer>-->
+    <footer></footer>
 </body>
 </html>

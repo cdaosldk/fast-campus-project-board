@@ -1,6 +1,6 @@
 plugins {
 	id 'java'
-	id 'org.springframework.boot' version '3.2.2'
+	id 'org.springframework.boot' version '2.7.0'
 	id 'io.spring.dependency-management' version '1.1.4'
 }
 
@@ -10,6 +10,10 @@ version = '0.0.1-SNAPSHOT'
 java {
 	sourceCompatibility = '17'
 }
+//
+//tasks.withType(JavaCompile).configureEach {
+//	options.compilerArgs.add("-parameters")
+//}
 
 configurations {
 	compileOnly {
@@ -26,8 +30,15 @@ dependencies {
 			,	'org.springframework.boot:spring-boot-starter-web'
 			,	'org.springframework.boot:spring-boot-starter-data-jpa:'
 			,	'org.springframework.boot:spring-boot-starter-data-rest'
-			,	'org.springframework.data:spring-data-rest-hal-explorer' )
-	runtimeOnly('com.h2database:h2:',	'com.mysql:mysql-connector-j')
+			,	'org.springframework.data:spring-data-rest-hal-explorer'
+			,	'org.springframework.boot:spring-boot-starter-thymeleaf'
+			// 사용자가 만든 프로퍼티에 대한 문서화가 가능해진다
+			,	'org.springframework.boot:spring-boot-configuration-processor'
+			,	'org.springframework.boot:spring-boot-starter-security'
+			, 	'org.springframework.boot:spring-boot-starter-thymeleaf'
+			,  'org.thymeleaf.extras:thymeleaf-extras-springsecurity5' )// 타임리프 + 시큐리티는 필수
+//	runtimeOnly('com.h2database:h2:',	'com.mysql:mysql-connector-j')
+	runtimeOnly('com.h2database:h2:',	'mysql:mysql-connector-java')
 	compileOnly 'org.projectlombok:lombok'
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	annotationProcessor 'org.projectlombok:lombok'
@@ -38,8 +49,8 @@ dependencies {
 			,	'com.querydsl:querydsl-core' // 중요
 			, 	'com.querydsl:querydsl-collections')
 	// querydsl ~ gradle로 버전을 자동으로 들어가게 함
-//	annotationProcessor ("com.querydsl:querydsl-apt:${dependencyManagement.importedProperties['querydsl.version']}:jpa" ~ 스프링 부트 3이후부터는 jakarta
-	annotationProcessor ("com.querydsl:querydsl-apt:${dependencyManagement.importedProperties['querydsl.version']}:jakarta" // querydsl JPAAnnotationProcessor 사용 지정
+	annotationProcessor ("com.querydsl:querydsl-apt:${dependencyManagement.importedProperties['querydsl.version']}:jpa" //~ 스프링 부트 3이후부터는 jakarta
+//	annotationProcessor ("com.querydsl:querydsl-apt:${dependencyManagement.importedProperties['querydsl.version']}:jakarta" // querydsl JPAAnnotationProcessor 사용 지정
 			,	'jakarta.annotation:jakarta.annotation-api' // java.lang.NoClassDefFoundError (javax.annotation.Generated) 대응 코드
 			,	'jakarta.persistence:jakarta.persistence-api' )// java.lang.NoClassDefFoundError (javax.annotation.Entity) 대응 코드
 }

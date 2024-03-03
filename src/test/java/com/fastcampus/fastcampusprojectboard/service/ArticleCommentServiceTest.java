@@ -2,7 +2,9 @@ package com.fastcampus.fastcampusprojectboard.service;
 
 import com.fastcampus.fastcampusprojectboard.domain.Article;
 import com.fastcampus.fastcampusprojectboard.domain.ArticleComment;
+import com.fastcampus.fastcampusprojectboard.domain.UserAccount;
 import com.fastcampus.fastcampusprojectboard.dto.ArticleCommentDto;
+import com.fastcampus.fastcampusprojectboard.dto.UserAccountDto;
 import com.fastcampus.fastcampusprojectboard.repository.ArticleCommentRepository;
 import com.fastcampus.fastcampusprojectboard.repository.ArticleRepository;
 import org.junit.jupiter.api.DisplayName;
@@ -57,7 +59,7 @@ class ArticleCommentServiceTest {
     void givenArticleCommentInfo_whenSavingArticleComment_thenSavesArticleComment() {
         // Given
         ArticleCommentDto dto = createArticleCommentDto("댓글");
-        given(articleRepository.getReferenceById(dto.articleId())).willReturn(createAccount());
+        given(articleRepository.getReferenceById(dto.articleId())).willReturn(createArticle());
         given(articleCommentRepository.save(any(ArticleComment.class))).willReturn(null);
 
         // When
@@ -97,7 +99,7 @@ class ArticleCommentServiceTest {
         sut.updateArticleComment(dto);
 
         // Then
-        assertThat(articleComment.getContent())
+        assertThat(articleComment.getContents())
                 .isNotEqualTo(oldContent)
                 .isEqualTo(updatedContent);
         then(articleCommentRepository).should().getReferenceById(dto.id());

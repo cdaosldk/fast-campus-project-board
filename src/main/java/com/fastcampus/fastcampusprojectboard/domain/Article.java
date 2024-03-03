@@ -9,7 +9,7 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 @Getter
-@ToString
+@ToString(callSuper = true) // 안쪽까지 ToString
 @Table(indexes = {
         @Index(columnList = "title"),
         @Index(columnList = "hashtag"),
@@ -23,6 +23,8 @@ public class Article extends AuditingFields {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Setter @ManyToOne(optional = false) private UserAccount userAccount; // 유저 아이디
+
     // 도메인에서 사용자가 수정이 가능한 내용에만 setter를 사용한다
     // 본문 검색의 경우, mysql은 풀 텍스트 서치를 지원하고, 그렇지 않아도 엘라스틱 서치 등을 이용한다
     @Setter @Column(nullable = false) private String title;
@@ -30,12 +32,11 @@ public class Article extends AuditingFields {
 
     @Setter private String hashtag;
 
-    @OrderBy("id")
-    @OneToMany(mappedBy = "article", cascade = CascadeType.ALL)
-    @Setter
-    // toString이 모든 컬럼에 적용하기 위해 다 조회할 때, articleComment -> article -> articleComment .... ~ 제외해야한다
     @ToString.Exclude
-    private Set<ArticleComment> articleComments = new LinkedHashSet<>();
+    @OrderBy("createdAt DESC")
+    @OneToMany(mappedBy = "article", cascade = CascadeType.ALL)
+    // toString이 모든 컬럼에 적용하기 위해 다 조회할 때, articleComment -> article -> articleComment .... ~ 제외해야한다
+    private final Set<ArticleComment> articleComments = new LinkedHashSet<>();
 
     // 메타데이터 공통부분 추출 ~ 클래스를 만들고 필드를 공통 메타데이터로 한다
     // 1) 임베디드
@@ -49,15 +50,16 @@ public class Article extends AuditingFields {
     }
 
     // PK와 메타데이터는 제외하고 도메인에 관련있는 정보만 초기화 가능한 생성자를 만든다
-    private Article(String title, String contents, String hashtag) {
+    private Article(UserAccount userAccount, String title, String contents, String hashtag) {
+        this.userAccount = userAccount;
         this.title = title;
         this.contents = contents;
         this.hashtag = hashtag;
     }
 
     // 팩토리 메서드
-    public static Article of(String title, String contents, String hashtag) {
-        return new Article(title, contents, hashtag);
+    public static Article of(UserAccount userAccount, String title, String contents, String hashtag) {
+        return new Article(userAccount, title, contents, hashtag);
     }
 
     // 리스트로 게시판 데이터를 다룰 때 equals & hashcode를 사용 ~ @Entity에서는 id만 비교해도 충분하다

@@ -9,7 +9,7 @@ import javax.persistence.*;
 
 
 @Getter
-@ToString
+@ToString(callSuper = true)
 @Table(indexes = {
         @Index(columnList = "contents"),
         @Index(columnList = "createdAt"),
@@ -25,32 +25,25 @@ public class ArticleComment extends AuditingFields{
 
     @Setter
     @ManyToOne(optional = false)
-    @JoinColumn(name = "article_id")
-    private Article article;
+    private Article article; // 게시글
+
+    @Setter @ManyToOne(optional = false) private UserAccount userAccount;
 
     @Setter
     @Column(nullable = false, length = 500)
     private String contents;
 
-//    @CreatedDate
-//    @Column(nullable = false) private LocalDateTime createdAt;
-//    @CreatedBy
-//    @Column(nullable = false, length = 100) private String createdBy;
-//    @LastModifiedDate
-//    @Column(nullable = false) private LocalDateTime modifiedAt;
-//    @LastModifiedBy
-//    @Column(nullable = false, length = 100) private String modifiedBy;
-
     protected ArticleComment() {
     }
 
-    private ArticleComment(Article article, String contents) {
+    private ArticleComment(Article article, UserAccount userAccount, String contents) {
         this.article = article;
+        this.userAccount = userAccount;
         this.contents = contents;
     }
 
-    public static ArticleComment of(Article article, String contents) {
-        return new ArticleComment(article, contents);
+    public static ArticleComment of(Article article, UserAccount userAccount, String contents) {
+        return new ArticleComment(article, userAccount, contents);
     }
 
     @Override

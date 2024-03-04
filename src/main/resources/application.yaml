@@ -34,6 +34,9 @@ spring:
         format_sql: true
         # 복잡 쿼리를 사용할 때 최대 select 사이즈 설정 (n+1 문제 해결방안)
         default_batch_fetch_size: 100
+    # osiv 옵션을 해제한다
+    open-in-view: false
+
 
 #  h2:
 #    h2 웹 콘솔 활성화

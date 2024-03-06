@@ -18,7 +18,11 @@ public interface ArticleRepository extends
     ,   QuerydslPredicateExecutor<Article> // "검색" 기능을 위해서는 PE만 있어도 된다, "완전 일치"
     ,   QuerydslBinderCustomizer<QArticle> {
 
-    Page<Article> findByTitle(String title, Pageable pageable);
+    Page<Article> findByTitleContaining(String title, Pageable pageable);
+    Page<Article> findByContentsContaining(String contents, Pageable pageable);
+    Page<Article> findByUserAccount_UserIdContaining(String userId, Pageable pageable);
+    Page<Article> findByUserAccount_NicknameContaining(String nickName, Pageable pageable);
+    Page<Article> findByHashtag(String hashtag, Pageable pageable);
 
     @Override
     default void customize(QuerydslBindings bindings, QArticle root) { // 확장 메서드

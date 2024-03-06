@@ -13,7 +13,11 @@
 <body>
 
 <!--&lt;!&ndash;    <header th:replace="header :: header"> &lt;!&ndash; th: replace와 insert ~ header 엘리멘트를 찾아가라&ndash;&gt;&ndash;&gt;</header>-->
-    <header id="header1"></header>
+    <header id="header1">
+        헤더 삽입부 <!-- 렌더링이 안되면 기본으로 보여주는 값 -->
+        <hr>
+    </header>
+
     <main class="container"> <!-- 부트스트랩 필수 -->
 
         <div class="row">
@@ -66,21 +70,21 @@
 <!--            <button type="submit">검색</button>-->
 <!--        </form>-->
 
-        <table class="table">
+        <table class="table" id="article-table">
             <thead>
                 <tr>
-                    <th class="col-6">제목</th>
-                    <th class="col-2">해시태그</th>
-                    <th class="">작성자</th>
-                    <th class="">작성일</th>
+                    <th class="title col-6">제목</th>
+                    <th class="hashtag col-2">해시태그</th>
+                    <th class="user-id col">작성자</th>
+                    <th class="created-at col">작성일</th>
                 </tr>
             </thead>
             <tbody>
                 <tr>
-                    <td>첫글</td>
-                    <td>#java</td>
-                    <td>admin</td>
-                    <td>2024-01-29</td>
+                    <td class="title"><a>첫글</a></td>
+                    <td class="hashtag">#java</td>
+                    <td class="user-id">admin</td>
+                    <td class="created-at"><time>2024-01-29</time></td>
                 </tr>
                 <tr>
                     <td>2</td>
@@ -121,7 +125,10 @@
     </main>
 
 <!--    <footer th:replace="footer :: footer"></footer>-->
-    <footer id="footer1"></footer>
+    <footer id="footer1">
+        <hr>
+        푸터 삽입부 <!-- 렌더링이 안되면 기본으로 보여주는 값 -->
+    </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" crossorigin="anonymous"></script>
 </body>

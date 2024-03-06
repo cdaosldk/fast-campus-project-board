@@ -2,4 +2,16 @@
 <thlogic>
     <attr sel="#header1" th:replace= "header:: header"/>
     <attr sel="#footer1" th:replace= "footer :: footer"/>
+
+    <attr sel="#article-table">
+        <attr sel="tbody" th:remove="all-but-first"> <!-- 첫번쨰를 제외한 목업데이터 삭제 -->
+            <attr sel="tr[0]" th:each="article : ${articles}">
+                <attr sel="td.title/a" th:text="${article.title}" th:href="@{'/articles/' + ${article.id}}" /> <!-- a 태그에 직접 편집 -->
+                <attr sel="td.hashtag" th:text="${article.hashtag}" />
+                <attr sel="td.user-id" th:text="${article.nickname}" />
+                <attr sel="td.created-at/time" th:datetime="${article.createdAt}" th:text="${#temporals.format(article.createdAt, 'yyyy-MM-dd')}" />
+                <!-- time 태그에 직접 편집, temporals ~ 시간관련 -->
+            </attr>
+        </attr>
+    </attr>
 </thlogic>

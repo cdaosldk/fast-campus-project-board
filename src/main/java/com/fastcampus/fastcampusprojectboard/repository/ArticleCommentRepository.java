@@ -23,10 +23,10 @@ public interface ArticleCommentRepository extends
     @Override
     default void customize(QuerydslBindings bindings, QArticleComment root) {
         bindings.excludeUnlistedProperties(true); // 선택한 필드만 검색이 가능하게 만든다
-        bindings.including(root.createdAt, root.createdBy, root.contents); // 제목, 해시태그, 생성일시, 생성자, 본문 검색 허용
+        bindings.including(root.createdAt, root.createdBy, root.content); // 제목, 해시태그, 생성일시, 생성자, 본문 검색 허용
         bindings.bind(root.createdAt).first(DateTimeExpression::eq); // 대소문자 구분없이 일치하는 표현을 포함하는 검색
         bindings.bind(root.createdBy).first(StringExpression::containsIgnoreCase); // 대소문자 구분없이 일치하는 표현을 포함하는 검색
-        bindings.bind(root.contents).first(StringExpression::containsIgnoreCase); // 대소문자 구분없이 일치하는 표현을 포함하는 검색
+        bindings.bind(root.content).first(StringExpression::containsIgnoreCase); // 대소문자 구분없이 일치하는 표현을 포함하는 검색
     }
 }
 

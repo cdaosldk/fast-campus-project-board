@@ -48,7 +48,7 @@ class ArticleCommentServiceTest {
         assertThat(actual)
                 .hasSize(1)
                 .first()
-                .hasFieldOrPropertyWithValue("content", expected.getContents());
+                .hasFieldOrPropertyWithValue("content", expected.getContent());
 
         then(articleCommentRepository).should().findByArticle_Id(articleId);
 
@@ -99,7 +99,7 @@ class ArticleCommentServiceTest {
         sut.updateArticleComment(dto);
 
         // Then
-        assertThat(articleComment.getContents())
+        assertThat(articleComment.getContent())
                 .isNotEqualTo(oldContent)
                 .isEqualTo(updatedContent);
         then(articleCommentRepository).should().getReferenceById(dto.id());

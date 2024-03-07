@@ -30,7 +30,7 @@ public class ArticleService {
 
         return switch (searchType) { // 자바 12부터 가능
             case TITLE -> articleRepository.findByTitleContaining(searchKeyword, pageable).map(ArticleDto::from);
-            case CONTENT -> articleRepository.findByContentsContaining(searchKeyword, pageable).map(ArticleDto::from);
+            case CONTENT -> articleRepository.findByContentContaining(searchKeyword, pageable).map(ArticleDto::from);
             case ID -> articleRepository.findByUserAccount_UserIdContaining(searchKeyword, pageable).map(ArticleDto::from);
             case NICKNAME -> articleRepository.findByUserAccount_NicknameContaining(searchKeyword, pageable).map(ArticleDto::from);
             case HASHTAG -> articleRepository.findByHashtag(searchKeyword, pageable).map(ArticleDto::from);
@@ -57,7 +57,7 @@ public class ArticleService {
         try {
             Article article = articleRepository.getReferenceById(articleDto.id()); // EntitiyNotFoundException
             if (articleDto.title() != null) article.setTitle(articleDto.title()); // getter, setter는 레코드에서 자동으로 만든다
-            if (articleDto.contents() != null) article.setContents(articleDto.contents());
+            if (articleDto.content() != null) article.setContent(articleDto.content());
             if (articleDto.hashtag() != null) article.setHashtag(articleDto.hashtag());
 
             // 현재 해당 메서드는 트랜젝션이 설정되어 있으므로 영속성 컨텍스트는 메서드 수행 후 내용 변경을 감지하고

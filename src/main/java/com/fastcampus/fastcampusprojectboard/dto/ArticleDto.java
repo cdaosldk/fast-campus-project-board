@@ -11,7 +11,7 @@ public record ArticleDto(
         Long id,
         UserAccountDto userAccountDto,
         String title,
-        String contents,
+        String content,
         String hashtag,
         LocalDateTime createdAt,
         String createdBy,
@@ -21,7 +21,7 @@ public record ArticleDto(
     public static ArticleDto of(Long id,
                                 UserAccountDto userAccountDto,
                                 String title,
-                                String contents,
+                                String content,
                                 String hashtag,
                                 LocalDateTime createdAt,
                                 String createdBy,
@@ -30,7 +30,7 @@ public record ArticleDto(
         return new ArticleDto(id,
                 userAccountDto,
                 title,
-                contents,
+                content,
                 hashtag,
                 createdAt,
                 createdBy,
@@ -43,7 +43,7 @@ public record ArticleDto(
                 entity.getId(),
                 UserAccountDto.from(entity.getUserAccount()),
                 entity.getTitle(),
-                entity.getContents(),
+                entity.getContent(),
                 entity.getHashtag(),
                 entity.getCreatedAt(),
                 entity.getCreatedBy(),
@@ -56,7 +56,7 @@ public record ArticleDto(
         return Article.of(
                 userAccountDto.toEntity(),
                 title,
-                contents,
+                content,
                 hashtag
         );
     }

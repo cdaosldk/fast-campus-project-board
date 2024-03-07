@@ -81,7 +81,7 @@ class ArticleServiceTest {
         // Then
         assertThat(dto)
                 .hasFieldOrPropertyWithValue("title", article.getTitle())
-                .hasFieldOrPropertyWithValue("contents", article.getContents())
+                .hasFieldOrPropertyWithValue("content", article.getContent())
                 .hasFieldOrPropertyWithValue("hashtag", article.getHashtag());
         then(articleRepository).should().findById(articleId);
     }
@@ -134,7 +134,7 @@ class ArticleServiceTest {
         // then
         assertThat(article)
                 .hasFieldOrPropertyWithValue("title", dto.title())
-                .hasFieldOrPropertyWithValue("contents", dto.contents())
+                .hasFieldOrPropertyWithValue("content", dto.content())
                 .hasFieldOrPropertyWithValue("hashtag", dto.hashtag());
         then(articleRepository).should().getReferenceById(dto.id());
     }

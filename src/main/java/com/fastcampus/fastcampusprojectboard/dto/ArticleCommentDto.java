@@ -12,7 +12,7 @@ public record ArticleCommentDto(
         Long id,
         Long articleId,
         UserAccountDto userAccountDto,
-        String contents,
+        String content,
         LocalDateTime createdAt,
         String createdBy,
         LocalDateTime modifiedAt,
@@ -27,7 +27,7 @@ public record ArticleCommentDto(
                 entity.getId(),
                 entity.getArticle().getId(),
                 UserAccountDto.from(entity.getUserAccount()),
-                entity.getContents(),
+                entity.getContent(),
                 entity.getCreatedAt(),
                 entity.getCreatedBy(),
                 entity.getModifiedAt(),
@@ -39,7 +39,7 @@ public record ArticleCommentDto(
         return ArticleComment.of(
                 entity,
                 userAccountDto.toEntity(),
-                contents
+                content
         );
     }
 

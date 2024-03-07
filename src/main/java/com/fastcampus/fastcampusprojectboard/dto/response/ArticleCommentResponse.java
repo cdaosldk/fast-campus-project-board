@@ -7,18 +7,18 @@ import java.time.LocalDateTime;
 
 public record ArticleCommentResponse(
         Long id,
-        String contents,
+        String content,
         LocalDateTime createdAt,
         String email,
         String nickname
 ) implements Serializable {
 
     public static ArticleCommentResponse of(Long id,
-                                            String contents,
+                                            String content,
                                             LocalDateTime createdAt,
                                             String email,
                                             String nickname) {
-        return new ArticleCommentResponse(id, contents, createdAt, email, nickname);
+        return new ArticleCommentResponse(id, content, createdAt, email, nickname);
     }
 
     public static ArticleCommentResponse from(ArticleCommentDto dto) {
@@ -29,7 +29,7 @@ public record ArticleCommentResponse(
 
         return new ArticleCommentResponse(
                 dto.id(),
-                dto.contents(),
+                dto.content(),
                 dto.createdAt(),
                 dto.userAccountDto().email(),
                 nickname

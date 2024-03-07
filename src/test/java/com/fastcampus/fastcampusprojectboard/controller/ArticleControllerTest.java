@@ -112,7 +112,7 @@ class ArticleControllerTest {
                 createUserAccountDto(),
                 Set.of(),
                 "title",
-                "contents",
+                "content",
                 "#java",
                 LocalDateTime.now(),
                 "uno",

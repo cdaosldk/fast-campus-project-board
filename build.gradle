@@ -45,7 +45,8 @@ dependencies {
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 
 	// queryDsl
-	implementation('com.querydsl:querydsl-jpa:5.0.0:jakarta' // 중요
+//	implementation('com.querydsl:querydsl-jpa:5.0.0:jakarta' 스프링 부트 3 이상
+	implementation('com.querydsl:querydsl-jpa' // 중요
 			,	'com.querydsl:querydsl-core' // 중요
 			, 	'com.querydsl:querydsl-collections')
 	// querydsl ~ gradle로 버전을 자동으로 들어가게 함

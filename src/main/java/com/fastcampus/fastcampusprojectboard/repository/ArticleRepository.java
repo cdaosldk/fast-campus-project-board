@@ -2,6 +2,7 @@ package com.fastcampus.fastcampusprojectboard.repository;
 
 import com.fastcampus.fastcampusprojectboard.domain.Article;
 import com.fastcampus.fastcampusprojectboard.domain.QArticle;
+import com.fastcampus.fastcampusprojectboard.repository.querydsl.ArticleRepositoryCustom;
 import com.querydsl.core.types.dsl.DateTimeExpression;
 import com.querydsl.core.types.dsl.StringExpression;
 import org.springframework.data.domain.Page;
@@ -15,6 +16,7 @@ import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 @RepositoryRestResource
 public interface ArticleRepository extends
         JpaRepository<Article, Long>
+    ,   ArticleRepositoryCustom
     ,   QuerydslPredicateExecutor<Article> // "검색" 기능을 위해서는 PE만 있어도 된다, "완전 일치"
     ,   QuerydslBinderCustomizer<QArticle> {
 

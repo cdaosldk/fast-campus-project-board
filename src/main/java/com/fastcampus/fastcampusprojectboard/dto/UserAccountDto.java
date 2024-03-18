@@ -15,6 +15,24 @@ public record UserAccountDto(
         LocalDateTime modifiedAt,
         String modifiedBy
 ) {
+
+    // 레포지토리 레이어에 저장될 때는 JPA Auditiong으로 기록한 메타데이터가 없으므로, null로도 생성 가능한 팩토리 메서드 추가
+    public static UserAccountDto of(String userId,
+                                    String userPassword,
+                                    String email,
+                                    String nickname,
+                                    String memo) {
+        return new UserAccountDto(
+                userId,
+                userPassword,
+                email,
+                nickname,
+                memo,
+                null,
+                null,
+                null,
+                null);
+    }
     public static UserAccountDto of(String userId,
                                     String userPassword,
                                     String email,
@@ -24,7 +42,8 @@ public record UserAccountDto(
                                     String createdBy,
                                     LocalDateTime modifiedAt,
                                     String modifiedBy) {
-        return new UserAccountDto(userId,
+        return new UserAccountDto(
+                userId,
                 userPassword,
                 email,
                 nickname,

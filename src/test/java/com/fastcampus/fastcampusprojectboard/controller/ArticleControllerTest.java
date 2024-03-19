@@ -1,11 +1,16 @@
 package com.fastcampus.fastcampusprojectboard.controller;
 
 import com.fastcampus.fastcampusprojectboard.config.SecurityConfig;
-import com.fastcampus.fastcampusprojectboard.domain.type.SearchType;
+import com.fastcampus.fastcampusprojectboard.domain.constant.FormStatus;
+import com.fastcampus.fastcampusprojectboard.domain.constant.SearchType;
+import com.fastcampus.fastcampusprojectboard.dto.ArticleDto;
 import com.fastcampus.fastcampusprojectboard.dto.ArticleWithCommentsDto;
 import com.fastcampus.fastcampusprojectboard.dto.UserAccountDto;
+import com.fastcampus.fastcampusprojectboard.dto.request.ArticleRequest;
+import com.fastcampus.fastcampusprojectboard.dto.response.ArticleResponse;
 import com.fastcampus.fastcampusprojectboard.service.ArticleService;
 import com.fastcampus.fastcampusprojectboard.service.PaginationService;
+import com.fastcampus.fastcampusprojectboard.util.FormDataEncoder;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -25,17 +30,19 @@ import java.util.List;
 import java.util.Set;
 
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.then;
+import static org.mockito.BDDMockito.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @DisplayName("View 컨트롤러 - 게시글")
-@Import(SecurityConfig.class)
+@Import({SecurityConfig.class, FormDataEncoder.class})
 @WebMvcTest(ArticleController.class)
 class ArticleControllerTest {
 
-    private final MockMvc mockMvc;
+    private final MockMvc mvc;
+    private final FormDataEncoder formDataEncoder;
 
     // 스프링 슬라이스 테스트에서 해당 빈만 가져오고 싶을 떄
     @MockBean private ArticleService articleService;
@@ -43,8 +50,10 @@ class ArticleControllerTest {
 
     // 테스트 패키지에 있으면 생성자가 하나만 있는 경우 @Autowired를 생략할 수 없다 + @Autowired는 필드주입이 아닌 생성자 주입이 권장됨
     // @MockBean의 경우 생성자의 파라미터로 넣을 수 없다(스프링 부트 2.7) ~ 그래서 필드주입을 해야만 한다
-    public ArticleControllerTest(@Autowired MockMvc mockMvc) {
-        this.mockMvc = mockMvc;
+    public ArticleControllerTest(@Autowired MockMvc mvc,
+                                 @Autowired FormDataEncoder formDataEncoder) {
+        this.mvc = mvc;
+        this.formDataEncoder = formDataEncoder;
     }
 
     @DisplayName("[view][GET] 게시글 리스트 페이지 - 정상 호출")
@@ -56,7 +65,7 @@ class ArticleControllerTest {
         given(paginationService.getPaginationBarNumbers(anyInt(), anyInt())).willReturn(List.of(0, 1, 2, 3, 4)); // argument matcher의 any()는 null을 허용하므로 페이징에 적절하지 않다
 
         // when & then
-        mockMvc.perform(get("/articles"))
+        mvc.perform(get("/articles"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_HTML))
                 .andExpect(view().name("articles/index"))
@@ -79,7 +88,7 @@ class ArticleControllerTest {
         given(paginationService.getPaginationBarNumbers(anyInt(), anyInt())).willReturn(List.of(0, 1, 2, 3, 4)); // argument matcher의 any()는 null을 허용하므로 페이징에 적절하지 않다
 
         // when & then
-        mockMvc.perform(
+        mvc.perform(
                 get("/articles")
                         .queryParam("searchType", searchType.name())
                         .queryParam("searchValue", searchValue))
@@ -106,7 +115,7 @@ class ArticleControllerTest {
         given(paginationService.getPaginationBarNumbers(pageable.getPageNumber(), Page.empty().getTotalPages())).willReturn(barNumbers);
 
         // When & Then
-        mockMvc.perform(
+        mvc.perform(
                         get("/articles")
                                 .queryParam("page", String.valueOf(pageNumber))
                                 .queryParam("size", String.valueOf(pageSize))
@@ -126,17 +135,118 @@ class ArticleControllerTest {
     public void giveNothing_whenRequestingArticleView_thenReturnsArticleView() throws Exception {
         // given
         Long articleId = 1L;
-        given(articleService.getArticle(articleId)).willReturn(createArticlewithCommentsDto());
+        given(articleService.getArticleWithComments(articleId)).willReturn(createArticlewithCommentsDto());
 
         // when & then
-        mockMvc.perform(get("/articles/" + articleId))
+        mvc.perform(get("/articles/" + articleId))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_HTML))
                 .andExpect(view().name("articles/detail"))
                 .andExpect(model().attributeExists("article"))
                 .andExpect(model().attributeExists("articleComments"));
 
+        then(articleService).should().getArticleWithComments(articleId);
+    }
+
+    @DisplayName("[view][GET] 새 게시글 작성 페이지")
+    @Test
+    void givenNothing_whenRequesting_thenReturnsNewArticlePage() throws Exception {
+        // Given
+
+        // When & Then
+        mvc.perform(get("/articles/form"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_HTML))
+                .andExpect(view().name("articles/form"))
+                .andExpect(model().attribute("formStatus", FormStatus.CREATE));
+    }
+
+    @DisplayName("[view][POST] 새 게시글 등록 - 정상 호출")
+    @Test
+    void givenNewArticleInfo_whenRequesting_thenSavesNewArticle() throws Exception {
+        // Given
+        ArticleRequest articleRequest = ArticleRequest.of("new title", "new content", "#new");
+        willDoNothing().given(articleService).saveArticle(any(ArticleDto.class));
+
+        // When & Then
+        mvc.perform(
+                        post("/articles/form")
+                                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                                .content(formDataEncoder.encode(articleRequest))
+                                .with(csrf())
+                )
+                .andExpect(status().is3xxRedirection())
+                .andExpect(view().name("redirect:/articles"))
+                .andExpect(redirectedUrl("/articles"));
+        then(articleService).should().saveArticle(any(ArticleDto.class));
+    }
+
+    @DisplayName("[view][GET] 게시글 수정 페이지")
+    @Test
+    void givenNothing_whenRequesting_thenReturnsUpdatedArticlePage() throws Exception {
+        // Given
+        long articleId = 1L;
+        ArticleDto dto = createArticleDto();
+        given(articleService.getArticle(articleId)).willReturn(dto);
+
+        // When & Then
+        mvc.perform(get("/articles/" + articleId + "/form"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_HTML))
+                .andExpect(view().name("articles/form"))
+                .andExpect(model().attribute("article", ArticleResponse.from(dto)))
+                .andExpect(model().attribute("formStatus", FormStatus.UPDATE));
         then(articleService).should().getArticle(articleId);
+    }
+
+    @DisplayName("[view][POST] 게시글 수정 - 정상 호출")
+    @Test
+    void givenUpdatedArticleInfo_whenRequesting_thenUpdatesNewArticle() throws Exception {
+        // Given
+        long articleId = 1L;
+        ArticleRequest articleRequest = ArticleRequest.of("new title", "new content", "#new");
+        willDoNothing().given(articleService).updateArticle(eq(articleId), any(ArticleDto.class));
+
+        // When & Then
+        mvc.perform(
+                        post("/articles/" + articleId + "/form")
+                                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                                .content(formDataEncoder.encode(articleRequest))
+                                .with(csrf())
+                )
+                .andExpect(status().is3xxRedirection())
+                .andExpect(view().name("redirect:/articles/" + articleId))
+                .andExpect(redirectedUrl("/articles/" + articleId));
+        then(articleService).should().updateArticle(eq(articleId), any(ArticleDto.class));
+    }
+
+    @DisplayName("[view][POST] 게시글 삭제 - 정상 호출")
+    @Test
+    void givenArticleIdToDelete_whenRequesting_thenDeletesArticle() throws Exception {
+        // Given
+        long articleId = 1L;
+        willDoNothing().given(articleService).deleteArticle(articleId);
+
+        // When & Then
+        mvc.perform(
+                        post("/articles/" + articleId + "/delete")
+                                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                                .with(csrf())
+                )
+                .andExpect(status().is3xxRedirection())
+                .andExpect(view().name("redirect:/articles"))
+                .andExpect(redirectedUrl("/articles"));
+        then(articleService).should().deleteArticle(articleId);
+    }
+
+
+    private ArticleDto createArticleDto() {
+        return ArticleDto.of(
+                createUserAccountDto(),
+                "title",
+                "content",
+                "#java"
+        );
     }
 
     @Disabled("구현 중")
@@ -147,7 +257,7 @@ class ArticleControllerTest {
 
 
         // when & then
-        mockMvc.perform(get("/articles/search"))
+        mvc.perform(get("/articles/search"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_HTML))
                 .andExpect(view().name("articles/search"));
@@ -164,7 +274,7 @@ class ArticleControllerTest {
         given(paginationService.getPaginationBarNumbers(anyInt(), anyInt())).willReturn(List.of(1, 2, 3, 4, 5));
 
         // when & then
-        mockMvc.perform(get("/articles/search-hashtag"))
+        mvc.perform(get("/articles/search-hashtag"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_HTML))
                 .andExpect(view().name("articles/search-hashtag"))
@@ -190,7 +300,7 @@ class ArticleControllerTest {
         given(paginationService.getPaginationBarNumbers(anyInt(), anyInt())).willReturn(List.of(1, 2, 3, 4, 5));
 
         // when & then
-        mockMvc.perform(
+        mvc.perform(
                 get("/articles/search-hashtag")
                         .queryParam("searchValue", hashtag))
                 .andExpect(status().isOk())
@@ -224,7 +334,6 @@ class ArticleControllerTest {
 
     private UserAccountDto createUserAccountDto() {
         return UserAccountDto.of(
-                1L,
                 "uno",
                 "password",
                 "uno@mail.com",

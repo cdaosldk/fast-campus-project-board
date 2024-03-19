@@ -23,7 +23,7 @@ public class Article extends AuditingFields {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Setter @ManyToOne(optional = false) private UserAccount userAccount; // 유저 아이디
+    @Setter @ManyToOne(optional = false) @JoinColumn(name = "userId") private UserAccount userAccount; // 유저 아이디
 
     // 도메인에서 사용자가 수정이 가능한 내용에만 setter를 사용한다
     // 본문 검색의 경우, mysql은 풀 텍스트 서치를 지원하고, 그렇지 않아도 엘라스틱 서치 등을 이용한다

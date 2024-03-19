@@ -5,7 +5,6 @@ import com.fastcampus.fastcampusprojectboard.domain.UserAccount;
 import java.time.LocalDateTime;
 
 public record UserAccountDto(
-        Long id,
         String userId,
         String userPassword,
         String email,
@@ -16,8 +15,25 @@ public record UserAccountDto(
         LocalDateTime modifiedAt,
         String modifiedBy
 ) {
-    public static UserAccountDto of(Long id,
-                                    String userId,
+
+    // 레포지토리 레이어에 저장될 때는 JPA Auditiong으로 기록한 메타데이터가 없으므로, null로도 생성 가능한 팩토리 메서드 추가
+    public static UserAccountDto of(String userId,
+                                    String userPassword,
+                                    String email,
+                                    String nickname,
+                                    String memo) {
+        return new UserAccountDto(
+                userId,
+                userPassword,
+                email,
+                nickname,
+                memo,
+                null,
+                null,
+                null,
+                null);
+    }
+    public static UserAccountDto of(String userId,
                                     String userPassword,
                                     String email,
                                     String nickname,
@@ -26,7 +42,7 @@ public record UserAccountDto(
                                     String createdBy,
                                     LocalDateTime modifiedAt,
                                     String modifiedBy) {
-        return new UserAccountDto(id,
+        return new UserAccountDto(
                 userId,
                 userPassword,
                 email,
@@ -40,7 +56,6 @@ public record UserAccountDto(
 
     public static UserAccountDto from(UserAccount entity) {
         return new UserAccountDto(
-                entity.getId(),
                 entity.getUserId(),
                 entity.getUserPassword(),
                 entity.getEmail(),

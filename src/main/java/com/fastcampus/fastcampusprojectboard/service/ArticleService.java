@@ -1,10 +1,12 @@
 package com.fastcampus.fastcampusprojectboard.service;
 
 import com.fastcampus.fastcampusprojectboard.domain.Article;
-import com.fastcampus.fastcampusprojectboard.domain.type.SearchType;
+import com.fastcampus.fastcampusprojectboard.domain.UserAccount;
+import com.fastcampus.fastcampusprojectboard.domain.constant.SearchType;
 import com.fastcampus.fastcampusprojectboard.dto.ArticleDto;
 import com.fastcampus.fastcampusprojectboard.dto.ArticleWithCommentsDto;
 import com.fastcampus.fastcampusprojectboard.repository.ArticleRepository;
+import com.fastcampus.fastcampusprojectboard.repository.UserAccountRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -22,6 +24,7 @@ import java.util.List;
 public class ArticleService {
 
     private final ArticleRepository articleRepository;
+    private final UserAccountRepository userAccountRepository;
 
     @Transactional(readOnly = true)
     public Page<ArticleDto> searchArticles(SearchType searchType, String searchKeyword, Pageable pageable) {
@@ -39,24 +42,32 @@ public class ArticleService {
     }
 
     @Transactional(readOnly = true)
-    public ArticleWithCommentsDto getArticle(Long articleId) {
+    public ArticleWithCommentsDto getArticleWithComments(Long articleId) {
         return articleRepository.findById(articleId)
                 .map(ArticleWithCommentsDto::from)
                 .orElseThrow(() -> new EntityNotFoundException("게시글이 없습니다 - articleId: " + articleId)); // 운영 편의를 위한 로깅
     }
 
-    public void saveArticle(ArticleDto articleDto) {
-        articleRepository.save(articleDto.toEntity());
+    @Transactional(readOnly = true)
+    public ArticleDto getArticle(Long articleId) {
+        return articleRepository.findById(articleId)
+                .map(ArticleDto::from)
+                .orElseThrow(() -> new EntityNotFoundException("게시글이 없습니다 - articleId: " + articleId));
     }
 
-    public void updateArticle(ArticleDto articleDto) {
+    public void saveArticle(ArticleDto articleDto) {
+        UserAccount userAccount = userAccountRepository.getReferenceById(articleDto.userAccountDto().userId());
+        articleRepository.save(articleDto.toEntity(userAccount));
+    }
+
+    public void updateArticle(Long articleId, ArticleDto articleDto) {
         // getReferenceById가 아닐 경우 ~ 기존의 getOne() 메서드를 대체함 : 스프링부트 2.7부터
 //        Article article = articleRepository.findById(articleDto.id());// DTO에 해당하는 데이터가 실제로 있는지 쿼리를 날려서 확인하고 가져온다
 //        article.setHashtag(good);
 //        articleRepository.save(article); // ~ 영속성 컨텍스트에서 무조건 가져와야 하기 때문에 셀렉 쿼리 발생
 
         try {
-            Article article = articleRepository.getReferenceById(articleDto.id()); // EntitiyNotFoundException
+            Article article = articleRepository.getReferenceById(articleId); // EntitiyNotFoundException
             if (articleDto.title() != null) article.setTitle(articleDto.title()); // getter, setter는 레코드에서 자동으로 만든다
             if (articleDto.content() != null) article.setContent(articleDto.content());
             if (articleDto.hashtag() != null) article.setHashtag(articleDto.hashtag());

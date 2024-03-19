@@ -10,6 +10,7 @@ import com.fastcampus.fastcampusprojectboard.dto.request.ArticleRequest;
 import com.fastcampus.fastcampusprojectboard.dto.response.ArticleResponse;
 import com.fastcampus.fastcampusprojectboard.service.ArticleService;
 import com.fastcampus.fastcampusprojectboard.service.PaginationService;
+import com.fastcampus.fastcampusprojectboard.util.FormDataEncoder;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -30,7 +31,9 @@ import java.util.Set;
 
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @DisplayName("View 컨트롤러 - 게시글")

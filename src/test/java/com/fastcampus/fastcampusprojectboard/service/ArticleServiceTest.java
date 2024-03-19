@@ -146,7 +146,7 @@ class ArticleServiceTest {
         given(articleRepository.findById(articleId)).willReturn(Optional.of(article));
 
         // When
-        ArticleWithCommentsDto dto = sut.getArticleWithComments(articleId);
+        ArticleDto dto = sut.getArticle(articleId);
 
         // Then
         assertThat(dto)
@@ -178,7 +178,7 @@ class ArticleServiceTest {
     void givenArticleInfo_whenSavingArticle_thenSavesArticle() {
         // given
         ArticleDto dto = createArticleDto();
-        given(userAccountRepository.getReferenceById(dto.userAccountDto().userId()));
+        given(userAccountRepository.getReferenceById(dto.userAccountDto().userId())).willReturn(createUserAccount());
         given(articleRepository.save(any(Article.class))).willReturn(createArticle());
 //        willDoNothing().given(articleRepository.save(any(Article.class))); // JPA 메서드는 void가 아니므로 적절하지 않음
 

@@ -98,7 +98,7 @@ public class ArticleController {
         return "redirect:/articles";
     }
 
-    @GetMapping("/{articleId}/form")
+    @GetMapping("/{articleId}/form") // form 요청방식은 GET, POST 방식만 사용가능하다
     public String updateArticleForm(@PathVariable Long articleId, ModelMap map) {
         ArticleResponse article = ArticleResponse.from(articleService.getArticle(articleId));
 

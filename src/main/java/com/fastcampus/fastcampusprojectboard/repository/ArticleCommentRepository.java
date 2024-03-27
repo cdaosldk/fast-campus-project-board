@@ -20,6 +20,8 @@ public interface ArticleCommentRepository extends
 
     List<ArticleComment> findByArticle_Id(Long articleId); // 게시글 ID로 댓글 리스트를 조회하기 때문에 _id 사용
 
+    void deleteByIdAndUserAccount_UserId(Long articleId, String userId);
+
     @Override
     default void customize(QuerydslBindings bindings, QArticleComment root) {
         bindings.excludeUnlistedProperties(true); // 선택한 필드만 검색이 가능하게 만든다

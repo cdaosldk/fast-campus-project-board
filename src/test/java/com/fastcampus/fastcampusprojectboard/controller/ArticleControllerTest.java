@@ -1,6 +1,6 @@
 package com.fastcampus.fastcampusprojectboard.controller;
 
-import com.fastcampus.fastcampusprojectboard.config.SecurityConfig;
+import com.fastcampus.fastcampusprojectboard.config.TestSecurityConfig;
 import com.fastcampus.fastcampusprojectboard.domain.constant.FormStatus;
 import com.fastcampus.fastcampusprojectboard.domain.constant.SearchType;
 import com.fastcampus.fastcampusprojectboard.dto.ArticleDto;
@@ -23,6 +23,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.TestExecutionEvent;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDateTime;
@@ -37,7 +40,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @DisplayName("View 컨트롤러 - 게시글")
-@Import({SecurityConfig.class, FormDataEncoder.class})
+//@Import({SecurityConfig.class, FormDataEncoder.class})
+@Import({TestSecurityConfig.class, FormDataEncoder.class})
 @WebMvcTest(ArticleController.class)
 class ArticleControllerTest {
 
@@ -47,6 +51,8 @@ class ArticleControllerTest {
     // 스프링 슬라이스 테스트에서 해당 빈만 가져오고 싶을 떄
     @MockBean private ArticleService articleService;
     @MockBean private PaginationService paginationService;
+
+    // Security 통과를 위해 testSecurityConfig를 적용할 경우, 이 테스트에 userAccountRepository가 등장하지 않아도 되지만(UserDetailService를 사용해 인증정보를 가져오지 않아도 되지만), 유의해야 한다(이 컨트롤러에서 해당 레포지토리를 사용한 테스트가 없어야 한다)
 
     // 테스트 패키지에 있으면 생성자가 하나만 있는 경우 @Autowired를 생략할 수 없다 + @Autowired는 필드주입이 아닌 생성자 주입이 권장됨
     // @MockBean의 경우 생성자의 파라미터로 넣을 수 없다(스프링 부트 2.7) ~ 그래서 필드주입을 해야만 한다
@@ -71,7 +77,7 @@ class ArticleControllerTest {
                 .andExpect(view().name("articles/index"))
                 .andExpect(model().attributeExists("articles"))
                 .andExpect(model().attributeExists("paginationBarNumbers"));
-                //.andExpect(model().attributeExists("searchTypes"));
+        //.andExpect(model().attributeExists("searchTypes"));
 
         then(articleService).should().searchArticles(eq(null), eq(null), any(Pageable.class));
         then(paginationService).should().getPaginationBarNumbers(anyInt(), anyInt());
@@ -89,9 +95,9 @@ class ArticleControllerTest {
 
         // when & then
         mvc.perform(
-                get("/articles")
-                        .queryParam("searchType", searchType.name())
-                        .queryParam("searchValue", searchValue))
+                        get("/articles")
+                                .queryParam("searchType", searchType.name())
+                                .queryParam("searchValue", searchValue))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_HTML))
                 .andExpect(view().name("articles/index"))
@@ -130,7 +136,21 @@ class ArticleControllerTest {
         then(paginationService).should().getPaginationBarNumbers(pageable.getPageNumber(), Page.empty().getTotalPages());
     }
 
-    @DisplayName("[view][GET] 게시글 상세 페이지 - 정상 호출")
+    @DisplayName("[view][GET] 게시글 페이지 - 인증 없을 떈 로그인 페이지로 이동")
+    @Test
+    public void givenNothing_whenRequestingArticlePage_thenRedirectsToLoginPage() throws Exception {
+        // given
+        long articleId = 1L;
+
+        // when & then
+        mvc.perform(get("/articles/" + articleId))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrlPattern("**/login")); // redirectedUrl은 Full Url vs redirectedUrlPattern
+        then(articleService).shouldHaveNoInteractions();
+    }
+
+    @WithMockUser // 유저 정보 모킹 ~ 실제 유저 레포지토리의 정보를 사용하지 않는 경우 userAccountRepository를 모킹할 필요가 없다(실제 사용자 정보를 이용할 수 없다)
+    @DisplayName("[view][GET] 게시글 상세 페이지 - 정상 호출, 인증된 사용자")
     @Test
     public void giveNothing_whenRequestingArticleView_thenReturnsArticleView() throws Exception {
         // given
@@ -148,6 +168,7 @@ class ArticleControllerTest {
         then(articleService).should().getArticleWithComments(articleId);
     }
 
+    @WithMockUser // 유저 정보 모킹 ~ 실제 유저 레포지토리의 정보를 사용하지 않는 경우 userAccountRepository를 모킹할 필요가 없다(실제 사용자 정보를 이용할 수 없다)
     @DisplayName("[view][GET] 새 게시글 작성 페이지")
     @Test
     void givenNothing_whenRequesting_thenReturnsNewArticlePage() throws Exception {
@@ -161,6 +182,7 @@ class ArticleControllerTest {
                 .andExpect(model().attribute("formStatus", FormStatus.CREATE));
     }
 
+    @WithUserDetails(value = "unoTest", setupBefore = TestExecutionEvent.TEST_EXECUTION, userDetailsServiceBeanName = "userDetailsService") // 실제로 구현한 UserDetails 사용가능하다(DB에 정보가 있어야 한다)
     @DisplayName("[view][POST] 새 게시글 등록 - 정상 호출")
     @Test
     void givenNewArticleInfo_whenRequesting_thenSavesNewArticle() throws Exception {
@@ -174,6 +196,7 @@ class ArticleControllerTest {
                                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                                 .content(formDataEncoder.encode(articleRequest))
                                 .with(csrf())
+//                                .with(user(BoardPrincipal.of("uno", "asdf1234", "uno@mail.com", "Uno", "memo"))) // 하드 코딩
                 )
                 .andExpect(status().is3xxRedirection())
                 .andExpect(view().name("redirect:/articles"))
@@ -181,7 +204,21 @@ class ArticleControllerTest {
         then(articleService).should().saveArticle(any(ArticleDto.class));
     }
 
-    @DisplayName("[view][GET] 게시글 수정 페이지")
+    @DisplayName("[view][GET] 게시글 수정 페이지 - 인증 없을 떈 로그인 페이지로 이동")
+    @Test
+    public void givenNothing_whenRequesting_thenRedirectsToLoginPage() throws Exception {
+        // given
+        long articleId = 1L;
+
+        // when & then
+        mvc.perform(get("/articles/" + articleId + "/form"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrlPattern("**/login")); // redirectedUrl은 Full Url vs redirectedUrlPattern
+        then(articleService).shouldHaveNoInteractions();
+    }
+
+    @WithMockUser
+    @DisplayName("[view][GET] 게시글 수정 페이지 - 정상 호출, 인증된 사용자")
     @Test
     void givenNothing_whenRequesting_thenReturnsUpdatedArticlePage() throws Exception {
         // Given
@@ -199,6 +236,7 @@ class ArticleControllerTest {
         then(articleService).should().getArticle(articleId);
     }
 
+    @WithUserDetails(value = "unoTest", setupBefore = TestExecutionEvent.TEST_EXECUTION, userDetailsServiceBeanName = "userDetailsService")
     @DisplayName("[view][POST] 게시글 수정 - 정상 호출")
     @Test
     void givenUpdatedArticleInfo_whenRequesting_thenUpdatesNewArticle() throws Exception {
@@ -220,12 +258,14 @@ class ArticleControllerTest {
         then(articleService).should().updateArticle(eq(articleId), any(ArticleDto.class));
     }
 
+    @WithUserDetails(value = "unoTest", setupBefore = TestExecutionEvent.TEST_EXECUTION, userDetailsServiceBeanName = "userDetailsService")
     @DisplayName("[view][POST] 게시글 삭제 - 정상 호출")
     @Test
     void givenArticleIdToDelete_whenRequesting_thenDeletesArticle() throws Exception {
         // Given
         long articleId = 1L;
-        willDoNothing().given(articleService).deleteArticle(articleId);
+        String userId = "unoTest";
+        willDoNothing().given(articleService).deleteArticle(articleId, userId); // 권한 관리를 위한 userId 추가
 
         // When & Then
         mvc.perform(
@@ -236,7 +276,7 @@ class ArticleControllerTest {
                 .andExpect(status().is3xxRedirection())
                 .andExpect(view().name("redirect:/articles"))
                 .andExpect(redirectedUrl("/articles"));
-        then(articleService).should().deleteArticle(articleId);
+        then(articleService).should().deleteArticle(articleId, userId);
     }
 
 

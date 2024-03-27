@@ -1,23 +1,27 @@
 package com.fastcampus.fastcampusprojectboard.repository;
 
-import com.fastcampus.fastcampusprojectboard.config.JpaConfig;
 import com.fastcampus.fastcampusprojectboard.domain.Article;
 import com.fastcampus.fastcampusprojectboard.domain.UserAccount;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.AuditorAware;
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @ActiveProfiles("testdb") // 테스트 설정용 프로파일 yaml과 매핑
 //@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE) // 테스트용 디비를 사용하도록 설정
 @DisplayName("JPA 연결 테스트")
-@Import(JpaConfig.class)
+@Import(JpaRepositoryTest.TestJpaConfig.class)
 @DataJpaTest
 class JpaRepositoryTest {
 
@@ -95,5 +99,16 @@ class JpaRepositoryTest {
         // then
         assertThat(articleRepository.count()).isEqualTo(previousCountArticle - 1);
         assertThat(articleCommentRepository.count()).isEqualTo(previousCountComment - deletedCommentSize);
+    }
+
+
+    // Jpa Auditing을 테스트 때에만 Security를 무시하게 할 수 있다
+    @EnableJpaAuditing
+    @TestConfiguration
+    public static class TestJpaConfig {
+        @Bean
+        public AuditorAware<String> auditorAware() {
+            return () -> Optional.of("uno");
+        } // 스프링 시큐리티 적용 전 생성, 수정자를 고정, 테스트 시 사용
     }
 }

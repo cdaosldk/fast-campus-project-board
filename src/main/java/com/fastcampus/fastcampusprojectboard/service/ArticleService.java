@@ -68,20 +68,24 @@ public class ArticleService {
 
         try {
             Article article = articleRepository.getReferenceById(articleId); // EntitiyNotFoundException
-            if (articleDto.title() != null) article.setTitle(articleDto.title()); // getter, setter는 레코드에서 자동으로 만든다
-            if (articleDto.content() != null) article.setContent(articleDto.content());
-            if (articleDto.hashtag() != null) article.setHashtag(articleDto.hashtag());
+            UserAccount userAccount = userAccountRepository.getReferenceById(articleDto.userAccountDto().userId());
+
+            if (article.getUserAccount().equals(userAccount)) {
+                if (articleDto.title() != null) article.setTitle(articleDto.title()); // getter, setter는 레코드에서 자동으로 만든다
+                if (articleDto.content() != null) article.setContent(articleDto.content());
+                article.setHashtag(articleDto.hashtag());
+            }
 
             // 현재 해당 메서드는 트랜젝션이 설정되어 있으므로 영속성 컨텍스트는 메서드 수행 후 내용 변경을 감지하고
             // 업데이트 쿼리를 자동으로 날린다 (수동으로 설정할 수 있다)
         } catch (EntityNotFoundException e) {
-            log.warn("게시글 업데이트 실패, 게시글을 찾을 수 없습니다. - articleDto: {}", articleDto); // 인터폴레이션
+            log.warn("게시글 업데이트 실패, 게시글을 수정하는 데 필요한 정보를 찾을 수 없습니다. - articleDto: {}", e.getLocalizedMessage()); // 인터폴레이션
         }
 
     }
 
-    public void deleteArticle(Long articleId) {
-        articleRepository.deleteById(articleId);
+    public void deleteArticle(Long articleId, String userId) {
+        articleRepository.deleteByIdAndUserAccount_UserId(articleId, userId);
     }
 
     public long getArticleCount() {
